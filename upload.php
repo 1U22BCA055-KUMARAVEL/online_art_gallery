@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include('config.php');
@@ -15,6 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+<div class="sidebar">
+    <a href="index.php">Home</a>
+    <a href="gallery.php">Gallery</a>
+</div>
 <form method="POST" action="" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="Title" required><br>
     <input type="number" name="price" placeholder="Price" required><br>

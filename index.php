@@ -9,6 +9,14 @@ include('config.php');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Art Gallery</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-image: url('images/image.png'); /* Ensure this file exists in the correct directory */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -18,8 +26,11 @@ include('config.php');
                 <li><a href="index.php">Home</a></li>
                 <li><a href="gallery.php">Gallery</a></li>
                 <li><a href="upload.php">Upload Art</a></li>
-                <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
+                <?php if(isset($_SESSION['email'])): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="login.php">Login</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </header>

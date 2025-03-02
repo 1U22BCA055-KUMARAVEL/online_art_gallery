@@ -2,24 +2,37 @@
 session_start();
 include('config.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE email = '$email'";
-    $result = mysqli_query($conn, $query);
-    $row = mysqli_fetch_assoc($result);
+    $stmt = $conn->prepare("SELECT user_id, password, is_admin FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if ($row && password_verify($password, $row['password'])) {
-        $_SESSION['user_id'] = $row['id'];
-        $_SESSION['username'] = $row['username'];
-        header("Location: index.php");
-        exit();
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($user_id, $hashed_password, $is_admin);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_password)) {
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['email'] = $email;
+            $_SESSION['is_admin'] = $is_admin; // Store admin status
+
+            echo "<script>
+                    alert('Login successful!');
+                    window.location.href = 'index.php';
+                  </script>";
+        } else {
+            echo "<script>alert('Invalid password!');</script>";
+        }
     } else {
-        echo "Invalid email or password.";
+        echo "<script>alert('User not found!');</script>";
     }
 }
 ?>
+
 
 <style>
 body {
@@ -61,4 +74,3 @@ button:hover {
     <button type="submit">Login</button>
 </form>
 <p>Don't have an account? <a href="register.php">Register here</a></p>
-

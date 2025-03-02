@@ -1,30 +1,166 @@
-
 <?php
 session_start();
 include('config.php');
+
 $query = "SELECT * FROM artwork ORDER BY artwork_id DESC";
-$result = $conn->query($query);
+$result = mysqli_query($conn, $query);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-image: url('images/image.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background: #222;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            color: white;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            background: #333;
+        }
+        .sidebar a:hover {
+            background: #555;
+        }
+
+        /* Gallery Section */
+        .gallery-container {
+            margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+        .artwork {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .artwork img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .artwork h3 {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .artwork p {
+            color: #555;
+            font-size: 16px;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .delete-btn:hover {
+            background-color: darkred;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                text-align: center;
+                position: relative;
+                padding: 10px;
+            }
+            .gallery-container {
+                margin-left: 0;
+                width: 100%;
+            }
+            .gallery {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-    <h1>Art Gallery</h1>
-</header>
-<main>
-    <?php while ($row = $result->fetch_assoc()): ?>
-        <div class='artwork'>
-            <img src='uploads/<?= $row['image'] ?>' alt='<?= $row['title'] ?>'>
-            <h3><?= $row['title'] ?></h3>
-            <p>Price: $<?= $row['price'] ?></p>
+
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="index.php">Home</a>
+        <a href="upload.php">Upload Art</a>
+    </div>
+
+    <div class="gallery-container">
+        <h2>Gallery</h2>
+        <div class="gallery">
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                <div class="artwork">
+                    <img src="uploads/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
+                    <h3><?php echo htmlspecialchars($row['title']); ?></h3>
+                    <p>Price: $<?php echo htmlspecialchars($row['price']); ?></p>
+
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <?php if ($_SESSION['is_admin'] || $_SESSION['user_id'] == $row['user_id']): ?>
+                            <form method="POST" action="delete_art.php" onsubmit="return confirm('Are you sure you want to delete this artwork?');">
+                                <input type="hidden" name="artwork_id" value="<?php echo $row['artwork_id']; ?>">
+                                <input type="hidden" name="image" value="<?php echo $row['image']; ?>">
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endwhile; ?>
         </div>
-    <?php endwhile; ?>
-</main>
+    </div>
+
 </body>
 </html>

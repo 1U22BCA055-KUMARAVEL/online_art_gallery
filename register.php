@@ -1,20 +1,44 @@
 <?php
 include('config.php');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $name, $email, $password);
-    if ($stmt->execute()) {
-        header('Location: login.php');
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+
+    // Hash the password before storing it
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    // Check if the email is already registered
+    $check_email_query = "SELECT email FROM users WHERE email = ?";
+    $check_stmt = $conn->prepare($check_email_query);
+    $check_stmt->bind_param("s", $email);
+    $check_stmt->execute();
+    $check_stmt->store_result();
+
+    if ($check_stmt->num_rows > 0) {
+        echo "<script>
+                alert('Email is already registered! Please log in.');
+                window.location.href = 'login.php';
+              </script>";
         exit();
+    }
+
+    // Insert the new user into the database
+    $insert_query = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($insert_query);
+    $stmt->bind_param("sss", $name, $email, $hashed_password);
+
+    if ($stmt->execute()) {
+        echo "<script>
+                alert('Registration successful! Please log in.');
+                window.location.href = 'login.php';
+              </script>";
     } else {
-        echo "Error: " . $conn->error;
+        echo "<script>alert('Error: Could not register. Try again later.');</script>";
     }
 }
 ?>
-
 
 <style>
 body {

@@ -1,6 +1,9 @@
+
 <?php
 session_start();
 include('config.php');
+$query = "SELECT * FROM artwork ORDER BY artwork_id DESC";
+$result = $conn->query($query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,17 +18,13 @@ include('config.php');
     <h1>Art Gallery</h1>
 </header>
 <main>
-    <?php
-    $query = "SELECT * FROM artwork ORDER BY artwork_id DESC";
-    $result = mysqli_query($conn, $query);
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "<div class='artwork'>";
-        echo "<img src='uploads/" . $row['image'] . "' alt='" . $row['title'] . "'>";
-        echo "<h3>" . $row['title'] . "</h3>";
-        echo "<p>Price: $" . $row['price'] . "</p>";
-        echo "</div>";
-    }
-    ?>
+    <?php while ($row = $result->fetch_assoc()): ?>
+        <div class='artwork'>
+            <img src='uploads/<?= $row['image'] ?>' alt='<?= $row['title'] ?>'>
+            <h3><?= $row['title'] ?></h3>
+            <p>Price: $<?= $row['price'] ?></p>
+        </div>
+    <?php endwhile; ?>
 </main>
 </body>
 </html>

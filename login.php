@@ -1,16 +1,22 @@
 <?php
 session_start();
 include('config.php');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $query = "SELECT * FROM users WHERE email='$email' AND password='$password'";
+
+    $query = "SELECT * FROM users WHERE email = '$email'";
     $result = mysqli_query($conn, $query);
-    if (mysqli_num_rows($result) == 1) {
-        $_SESSION['email'] = $email;
-        header('Location: index.php');
+    $row = mysqli_fetch_assoc($result);
+
+    if ($row && password_verify($password, $row['password'])) {
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['username'] = $row['username'];
+        header("Location: index.php");
+        exit();
     } else {
-        echo "Invalid email or password";
+        echo "Invalid email or password.";
     }
 }
 ?>
@@ -55,3 +61,4 @@ button:hover {
     <button type="submit">Login</button>
 </form>
 <p>Don't have an account? <a href="register.php">Register here</a></p>
+

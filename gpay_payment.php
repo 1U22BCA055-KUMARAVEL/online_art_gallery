@@ -8,98 +8,125 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $artwork_id = $_GET['artwork_id'];
-$user_id = $_SESSION['user_id'];
+$amount = $_GET['amount'];
+$currency = $_GET['currency'];
 
-// Fetch artwork details
-$query = "SELECT * FROM artwork WHERE artwork_id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $artwork_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$artwork = $result->fetch_assoc();
-
-if ($artwork['user_id'] == $user_id) {
-    echo "<script>alert('You cannot buy your own artwork!'); window.location.href='gallery.php';</script>";
-    exit;
-}
-
-$price = $artwork['price'];
 ?>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Pay Payment</title>
-    <script src="https://pay.google.com/gp/p/js/pay.js"></script>
-    <script>
-        const paymentRequest = {
-            apiVersion: 2,
-            apiVersionMinor: 0,
-            allowedPaymentMethods: [{
-                type: 'CARD',
-                parameters: {
-                    allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
-                    allowedCardNetworks: ['VISA', 'MASTERCARD']
-                },
-                tokenizationSpecification: {
-                    type: 'PAYMENT_GATEWAY',
-                    parameters: {
-                        gateway: 'example',
-                        gatewayMerchantId: 'your_merchant_id'
-                    }
-                }
-            }],
-            merchantInfo: {
-                merchantId: 'your_merchant_id',
-                merchantName: 'Art Gallery'
-            },
-            transactionInfo: {
-                totalPriceStatus: 'FINAL',
-                totalPrice: '<?php echo $price; ?>',
-                currencyCode: 'INR' // Change dynamically based on user's location
-            }
-        };
-
-        function onGooglePayLoaded() {
-            const paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST' });
-            paymentsClient.isReadyToPay(paymentRequest).then(function(response) {
-                if (response.result) {
-                    const button = paymentsClient.createButton({
-                        onClick: onGooglePaymentButtonClicked
-                    });
-                    document.getElementById('gpay-button').appendChild(button);
-                }
-            });
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; background: #f9f9f9; }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
         }
 
-        function onGooglePaymentButtonClicked() {
-            const paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST' });
-            paymentsClient.loadPaymentData(paymentRequest).then(function(paymentData) {
-                // Send transaction details to server
-                fetch('process_gpay.php', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        artwork_id: '<?php echo $artwork_id; ?>',
-                        amount: '<?php echo $price; ?>',
-                        currency: 'INR'
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => response.json()).then(data => {
-                    if (data.success) {
-                        alert("Payment successful!");
-                        window.location.href = "gallery.php";
-                    } else {
-                        alert("Payment failed!");
-                    }
-                });
-            }).catch(err => console.log(err));
+        h2 { color: #333; margin-bottom: 15px; }
+        p { font-size: 16px; color: #555; }
+        
+        .qr-container {
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+            display: inline-block;
+        }
+        
+        .qr-container img {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+        }
+
+        .pay-btn {
+            display: inline-block;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .pay-btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Buy Artwork</h2>
+        <p><strong>Price:</strong> <?php echo $amount . " " . $currency; ?></p>
+        
+        <p>Scan this QR code to pay:</p>
+        <div class="qr-container">
+        <img src="https://github.com/1U22BCA055-KUMARAVEL/img_store/blob/main/gpay.png?raw=true<?php echo $amount; ?>&cu=<?php echo $currency; ?>" alt="Google Pay QR Code">
+        </div>
+
+        <button class="pay-btn" onclick="confirmPayment()">Confirm Payment</button>
+    </div>
+
+    <script>
+        function confirmPayment() {
+            let txn_id = prompt("Enter UPI Transaction ID:");
+            if (!txn_id) {
+                alert("Transaction ID is required!");
+                return;
+            }
+
+            let address = prompt("Enter your delivery address:");
+            if (!address) {
+                alert("Address is required!");
+                return;
+            }
+
+            let artworkId = <?php echo $artwork_id; ?>;
+            let amount = <?php echo $amount; ?>;
+            let currency = "<?php echo $currency; ?>";
+
+            fetch("process_payment.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    artwork_id: artworkId,
+                    amount: amount,
+                    currency: currency,
+                    address: address,
+                    txn_id: txn_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Payment Confirmed! Order Placed.");
+                    window.location.href = "gallery.php";
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => console.error("Error:", err));
         }
     </script>
-</head>
-<body onload="onGooglePayLoaded()">
-    <h3>Buy <?php echo $artwork['title']; ?></h3>
-    <p>Price: <?php echo $price; ?> INR</p>
-    <div id="gpay-button"></div>
+
 </body>
 </html>
+
+
+
+
+

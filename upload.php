@@ -54,7 +54,7 @@ function checkLogin() {
     
     if (!isLoggedIn) {
         alert("You must be logged in to upload an image!");
-        window.location.href = "login.php";
+        window.location.href = "login_module/login.php";
         return false;
     }
     return true;

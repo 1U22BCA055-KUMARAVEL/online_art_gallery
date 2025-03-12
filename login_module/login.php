@@ -1,6 +1,13 @@
 <?php
 session_start();
-include('config.php');
+
+// If user is already logged in, redirect to gallery.php
+if (isset($_SESSION['user'])) {
+    header("Location: gallery.php");
+    exit();
+}
+    
+include('../config.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
@@ -22,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             echo "<script>
                     alert('Login successful!');
-                    window.location.href = 'index.php';
+                    window.location.href = '../index.php';
                   </script>";
         } else {
             echo "<script>alert('Invalid password!');</script>";

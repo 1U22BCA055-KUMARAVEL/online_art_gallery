@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('config.php');
+include('../config.php');
 
 if (!isset($_SESSION['user_id'])) {
     echo "<script>alert('Please log in to proceed with payment'); window.location.href='login.php';</script>";
@@ -75,7 +75,7 @@ $currency = $_GET['currency'];
         
         <p>Scan this QR code to pay:</p>
         <div class="qr-container">
-        <img src="https://github.com/1U22BCA055-KUMARAVEL/img_store/blob/main/gpay.png?raw=true<?php echo $amount; ?>&cu=<?php echo $currency; ?>" alt="Google Pay QR Code">
+        <img src="../images/gpay.png">
         </div>
 
         <button class="pay-btn" onclick="confirmPayment()">Confirm Payment</button>

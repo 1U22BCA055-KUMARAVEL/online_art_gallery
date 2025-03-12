@@ -6,7 +6,7 @@ include('config.php'); // Ensure database connection
 if (!isset($_SESSION['user_id'])) {
     echo "<script>
             alert('You must be logged in to upload an image!');
-            window.location.href = 'login.php';
+            window.location.href = 'login_module/login.php';
           </script>";
     exit;
 }

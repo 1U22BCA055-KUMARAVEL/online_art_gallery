@@ -1,6 +1,5 @@
 <?php
 session_start();
-include('config.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,38 +9,28 @@ include('config.php');
     <title>Online Art Gallery</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Reset some default styles */
-* {
+        /* General Styles */
+body {
+    background-image: url('images/image.png');
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background-color: #f5f5f5;
+    background: #f8f9fa;
     color: #333;
-    line-height: 1.6;
 }
 
-/* Header Styles */
 header {
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
-    color: white;
-    padding: 20px;
+    background: #222;
+    color: #fff;
+    padding: 15px 20px;
     text-align: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-header h1 {
-    font-size: 2rem;
 }
 
 nav ul {
-    list-style: none;
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    list-style: none;
+    padding: 0;
 }
 
 nav ul li {
@@ -49,114 +38,126 @@ nav ul li {
 }
 
 nav ul li a {
-    color: white;
+    color: #fff;
     text-decoration: none;
-    font-size: 1.1rem;
-    padding: 8px 15px;
-    transition: background 0.3s ease-in-out;
+    font-size: 18px;
+    transition: 0.3s;
 }
 
 nav ul li a:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
+    color: #ffc107;
 }
 
-/* Main Content */
-main {
+/* Gallery Grid */
+.gallery-container {
     max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-    text-align: center;
+    margin: 30px auto;
+    padding: 10px;
 }
 
-h2 {
-    font-size: 1.8rem;
-    color: #444;
-    margin-bottom: 20px;
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
 }
 
-/* Artwork Grid */
 .artwork {
-    background: white;
+    background: #fff;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-}
-
-.artwork img {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-.artwork h3 {
-    margin: 10px 0;
-    font-size: 1.4rem;
-}
-
-.artwork p {
-    color: #555;
-    font-weight: bold;
+    transition: 0.3s;
 }
 
 .artwork:hover {
     transform: translateY(-5px);
 }
 
-/* Grid Layout */
-.artwork-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
+.artwork img {
+    width: 100%;
+    border-radius: 10px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.artwork h3 {
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.artwork p {
+    font-size: 16px;
+    color: #666;
+}
+
+.buy-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.buy-btn:hover {
+    background: #0056b3;
 }
 
 /* Footer */
 footer {
-    background: #333;
-    color: white;
     text-align: center;
-    padding: 15px;
+    background: #222;
+    color: #fff;
+    padding: 10px;
     margin-top: 30px;
 }
 
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Online Art Gallery</h1>
-        <nav>
-            <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="gallery.php">Gallery</a></li>
-                <li><a href="upload.php">Upload Art</a></li>
-                <?php if(isset($_SESSION['email'])): ?>
-                    <li><a href="login_module/logout.php">Logout</a></li>
-                <?php else: ?>
-                    <li><a href="login_module/login.php">Login</a></li>
-                <?php endif; ?>
-                
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <h2>Featured Artwork</h2>
+
+<header>
+    <h1>Online Art Gallery</h1>
+    <nav>
+        <ul>
+            <li><a href="index.php">Home</a></li>
+            <li><a href="gallery.php">Gallery</a></li>
+            <li><a href="upload.php">Upload Art</a></li>
+            <?php if(isset($_SESSION['email'])): ?>
+                <li><a href="login_module/logout.php">Logout</a></li>
+            <?php else: ?>
+                <li><a href="login_module/login.php">Login</a></li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</header>
+
+<main class="gallery-container">
+    <h2>Featured Artwork</h2>
+    <div class="gallery">
         <?php
+        include('config.php');
         $query = "SELECT * FROM artwork ORDER BY artwork_id DESC LIMIT 5";
         $result = mysqli_query($conn, $query);
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<div class='artwork'>";
             echo "<img src='uploads/" . $row['image'] . "' alt='" . $row['title'] . "'>";
             echo "<h3>" . $row['title'] . "</h3>";
-            echo "<p>Price: $" . $row['price'] . "</p>";
+            echo "<p>Price: ₹" . $row['price'] . "</p>";
             echo "</div>";
         }
         ?>
-    </main>
-    <footer>
-        <p>&copy; 2025 Online Art Gallery</p>
-    </footer>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Online Art Gallery</p>
+</footer>
+
 </body>
 </html>

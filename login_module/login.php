@@ -40,44 +40,80 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
-    padding: 50px;
-}
-form {
-    background: #fff;
-    padding: 20px;
-    display: inline-block;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px 0px #ccc;
-}
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-button:hover {
-    background-color: #218838;
-}
-</style>
-
-<form method="POST" action="">
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
-    <button type="submit">Login</button>
-</form>
-<p>Don't have an account? <a href="register.php">Register here</a></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        p {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        p a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        p a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form method="POST" action="">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="register.php">Register here</a></p>
+    </div>
+</body>
+</html>

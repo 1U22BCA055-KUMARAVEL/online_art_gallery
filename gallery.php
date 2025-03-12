@@ -1,8 +1,14 @@
 <?php
 session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: login_module/login.php");
+    exit();
+}
+
+
 include('config.php');
 
-$user_id = $_SESSION['user_id'] ?? null;
+
 
 // **Optimized Query**
 $query = "SELECT artwork_id, title, price, image, user_id FROM artwork";
@@ -41,48 +47,8 @@ if ($exchange_data && isset($exchange_data['conversion_rates']['USD'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery</title>
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; background: #f4f4f4; }
-        
-        /* Sidebar Styling */
-        .sidebar {
-            width: 250px;
-            background: #222;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
-            color: white;
-        }
-        .sidebar h2 { text-align: center; margin-bottom: 20px; }
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 12px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            text-align: center;
-            background: #333;
-        }
-        .sidebar a:hover { background: #555; }
-
-        /* Gallery Section */
-        .gallery-container { margin-left: 270px; padding: 20px; width: calc(100% - 270px); }
-        .gallery { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .artwork { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 250px; }
-        .artwork img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; }
-        .buy-btn { background-color: #28a745; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 5px; }
-        .buy-btn:hover { background-color: #218838; }
-        .delete-btn { background-color: red; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 5px; }
-        .delete-btn:hover { background-color: darkred; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; text-align: center; position: relative; padding: 10px; }
-            .gallery-container { margin-left: 0; width: 100%; }
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="style.css">
+   </head>
 <body>
 
     <div class="sidebar">
@@ -107,7 +73,7 @@ if ($exchange_data && isset($exchange_data['conversion_rates']['USD'])) {
 
                     <?php if ($user_id): ?>
                         <?php if ($row['user_id'] != $user_id): ?>
-                            <a href="gpay_payment.php?artwork_id=<?php echo $row['artwork_id']; ?>&amount=<?php echo $row['price']; ?>&currency=<?php echo $currency; ?>">
+                            <a href="product_module/gpay_payment.php?php echo $row['artwork_id']; ?>&amount=<?php echo $row['price']; ?>&currency=<?php echo $currency; ?>">
                                 <button class="buy-btn">Buy Now</button>
                             </a>
                         <?php else: ?>

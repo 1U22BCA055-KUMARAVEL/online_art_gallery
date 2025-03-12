@@ -114,7 +114,7 @@ $currency = $_GET['currency'];
             .then(data => {
                 if (data.success) {
                     alert("Payment Confirmed! Order Placed.");
-                    window.location.href = "gallery.php";
+                    window.location.href = "online_art_gallery/gallery.php";
                 } else {
                     alert(data.message);
                 }
